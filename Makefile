@@ -2,13 +2,13 @@ ARDUINO_IDE=/Applications/Arduino.app/Contents/MacOS/Arduino
 FIRMATA_INO=./firmata/firmata.ino
 GO_DIRS=publisher wemos
 
-.PHONY: all upload build $(GO_DIRS)
-
-upload:
-	$(ARDUINO_IDE) $(FIRMATA_INO) &
+.PHONY: upload build $(GO_DIRS)
 
 build: $(GO_DIRS)
 
 $(GO_DIRS):
 	@echo "Building '$@'"
 	@cd "$@" && go build
+
+upload:
+	$(ARDUINO_IDE) $(FIRMATA_INO) &

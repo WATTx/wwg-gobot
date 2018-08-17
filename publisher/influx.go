@@ -5,13 +5,13 @@ import (
 	"time"
 
 	client "github.com/influxdata/influxdb/client/v2"
+	"github.com/wattx/wwg-gobot/model"
 )
 
 const (
 	db = "wemos"
 
-	measurementHumidity = "humidity"
-	measurementMotion   = "motion"
+	measurementReading = "reading"
 )
 
 // Influx described InfluxDB client
@@ -37,8 +37,8 @@ func newInflux(url string) (*Influx, error) {
 	return &Influx{client: c}, nil
 }
 
-// WriteHumidity writes points to InfluxDB
-func (ix *Influx) WriteHumidity(h float32) error {
+// WriteReading writes points to InfluxDB
+func (ix *Influx) WriteReading(r model.Reading) error {
 	// Create a new point batch
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
 		Database:  db,
@@ -49,43 +49,14 @@ func (ix *Influx) WriteHumidity(h float32) error {
 	}
 
 	// Create a point and add to batch
-	tags := map[string]string{}
+	tags := map[string]string{
+		"type": r.Name(),
+	}
 	fields := map[string]interface{}{
-		"value": h,
+		"value": r.Data(),
 	}
 
-	pt, err := client.NewPoint(measurementHumidity, tags, fields, time.Now())
-	if err != nil {
-		return fmt.Errorf("unable to create new point: %s", err)
-	}
-	bp.AddPoint(pt)
-
-	// Write the batch
-	if err := ix.client.Write(bp); err != nil {
-		return fmt.Errorf("unable to write to influx: %s", err)
-	}
-
-	return nil
-}
-
-// WriteMotion writes points to InfluxDB
-func (ix *Influx) WriteMotion(i int) error {
-	// Create a new point batch
-	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
-		Database:  db,
-		Precision: "s",
-	})
-	if err != nil {
-		return fmt.Errorf("unable to create batch points: %s", err)
-	}
-
-	// Create a point and add to batch
-	tags := map[string]string{}
-	fields := map[string]interface{}{
-		"value": i,
-	}
-
-	pt, err := client.NewPoint(measurementMotion, tags, fields, time.Now())
+	pt, err := client.NewPoint(measurementReading, tags, fields, time.Now())
 	if err != nil {
 		return fmt.Errorf("unable to create new point: %s", err)
 	}

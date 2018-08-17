@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -10,11 +9,7 @@ import (
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/firmata"
 	"gobot.io/x/gobot/platforms/nats"
-)
-
-const (
-	topicHumidity = "humidity"
-	topicMotion   = "motion"
+	"github.com/wattx/wwg-gobot/model"
 )
 
 // Wemos describes esp
@@ -26,6 +21,8 @@ type Wemos struct {
 	bme    *i2c.BME280Driver
 	motion *gpio.PIRMotionDriver
 }
+
+
 
 // NewWemos constructs new struct
 func NewWemos(f *firmata.TCPAdaptor, n *nats.Adaptor) *Wemos {
@@ -64,19 +61,22 @@ func (w *Wemos) work() {
 			log.Printf("unable to get humidty: %s", err)
 		}
 
-		w.nats.Publish(topicHumidity, []byte(fmt.Sprintf("%.2f", h)))
+		msg := model.NewEnvelope(model.Humidity, &model.HumidityReading{h})
+		w.nats.Publish(*natsTOPIC, msg.Encode())
 	})
 
 	w.motion.On(gpio.MotionDetected, func(data interface{}) {
 		w.led.Off()
 
-		w.nats.Publish(topicMotion, []byte("1"))
+		msg := model.NewEnvelope(model.Motion, &model.MotionReading{1})
+		w.nats.Publish(*natsTOPIC, msg.Encode())
 	})
 
 	w.motion.On(gpio.MotionStopped, func(data interface{}) {
 		w.led.On()
 
-		w.nats.Publish(topicMotion, []byte("0"))
+		msg := model.NewEnvelope(model.Motion, &model.MotionReading{0})
+		w.nats.Publish(*natsTOPIC, msg.Encode())
 	})
 }
 

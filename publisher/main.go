@@ -2,45 +2,47 @@ package main
 
 import (
 	"log"
-	"strconv"
 
 	"github.com/namsral/flag"
 	"github.com/nats-io/nats"
-)
-
-const (
-	topicHumidity = "humidity"
-	topicMotion   = "motion"
+	"github.com/wattx/wwg-gobot/model"
 )
 
 var (
 	influxURL = flag.String("influx_url", "", "influxdb url")
 	natsURL   = flag.String("nats_url", "localhost:4222", "nats URL")
+	natsTOPIC   = flag.String("nats_topic", "", "nats TOPIC")
 )
 
-// byteToFloat32 converts slice of byte to float32
-func byteToFloat32(b []byte) (float32, error) {
-	value, err := strconv.ParseFloat(string(b), 32)
-	if err != nil {
-		return 0.0, err
-	}
+func newReadingProcessor(ix *Influx) chan<- []byte {
+	ch := make(chan []byte)
 
-	h := float32(value)
+	go func() {
+		for payload := range ch {
+			reading, err := model.UnpackEnvelope(payload)
+			if err != nil {
+				log.Printf("fail to unpack envelope `%s`, err: %s", payload, err)
+				continue
+			}
+			err = ix.WriteReading(reading)
 
-	return h, nil
-}
+			if err != nil {
+				log.Printf("unable to publish reading %s, err: %s", reading, err)
+				break
+			}
+		}
+		close(ch)
+	}()
 
-func byteToInt(b []byte) (int, error) {
-	i, err := strconv.Atoi(string(b))
-	if err != nil {
-		return 0, err
-	}
-
-	return i, nil
+    return ch
 }
 
 func main() {
 	flag.Parse()
+
+	if *natsTOPIC == "" {
+		log.Fatal("please specify NATS topic")
+	}
 
 	ix, err := newInflux(*influxURL)
 	if err != nil {
@@ -52,36 +54,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	nc.Subscribe(topicHumidity, func(msg *nats.Msg) {
-		h, err := byteToFloat32(msg.Data)
-		if err != nil {
-			log.Printf("unable to convert msg payload to float: %s", err)
-		}
-
-		log.Printf("received humidity: %.2f", h)
-
-		err = ix.WriteHumidity(h)
-		if err != nil {
-			log.Printf("unable to publish humidity: %s", err)
-
-			return
-		}
-	})
-
-	nc.Subscribe(topicMotion, func(msg *nats.Msg) {
-		i, err := byteToInt(msg.Data)
-		if err != nil {
-			log.Printf("unable to convert msg payload to float: %s", err)
-		}
-
-		log.Printf("received motion: %d", i)
-
-		err = ix.WriteMotion(i)
-		if err != nil {
-			log.Printf("unable to publish motion: %s", err)
-
-			return
-		}
+	ch := newReadingProcessor(ix)
+	nc.Subscribe(*natsTOPIC, func(msg *nats.Msg) {
+		payload := msg.Data
+		ch <- payload
+		log.Printf("received payload: %s", payload)
 	})
 
 	log.Println("Publisher is running.")
