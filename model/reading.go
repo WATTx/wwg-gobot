@@ -99,7 +99,7 @@ func (hr *HumidityReading) Decode(raw json.RawMessage) error {
 }
 
 func (hr HumidityReading) String() string {
-	return fmt.Sprintf("<HumidityMessage HumidityReading=%.2f>", hr.Value)
+	return fmt.Sprintf("<HumidityReading HumidityReading=%.2f>", hr.Value)
 }
 
 // Name name of the motion reading
