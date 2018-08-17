@@ -15,7 +15,7 @@ const (
 	Motion
 )
 
-// Reading functions across different reading
+// Reading common reading functions
 type Reading interface {
 	Name() string
 	Data() interface{}
