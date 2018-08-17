@@ -4,12 +4,12 @@ import (
 	"log"
 	"time"
 
+	"github.com/wattx/wwg-gobot/model"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/firmata"
 	"gobot.io/x/gobot/platforms/nats"
-	"github.com/wattx/wwg-gobot/model"
 )
 
 // Wemos describes esp
@@ -21,8 +21,6 @@ type Wemos struct {
 	bme    *i2c.BME280Driver
 	motion *gpio.PIRMotionDriver
 }
-
-
 
 // NewWemos constructs new struct
 func NewWemos(f *firmata.TCPAdaptor, n *nats.Adaptor) *Wemos {

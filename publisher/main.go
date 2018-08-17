@@ -11,7 +11,7 @@ import (
 var (
 	influxURL = flag.String("influx_url", "", "influxdb url")
 	natsURL   = flag.String("nats_url", "localhost:4222", "nats URL")
-	natsTOPIC   = flag.String("nats_topic", "", "nats TOPIC")
+	natsTOPIC = flag.String("nats_topic", "", "nats TOPIC")
 )
 
 func newReadingProcessor(ix *Influx) chan<- []byte {
@@ -34,7 +34,7 @@ func newReadingProcessor(ix *Influx) chan<- []byte {
 		close(ch)
 	}()
 
-    return ch
+	return ch
 }
 
 func main() {

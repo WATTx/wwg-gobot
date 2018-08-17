@@ -10,7 +10,7 @@ import (
 var (
 	firmataURL = flag.String("firmata_url", "", "firmata TCP address")
 	natsURL    = flag.String("nats_url", "localhost:4222", "nats URL")
-	natsTOPIC   = flag.String("nats_topic", "", "nats TOPIC")
+	natsTOPIC  = flag.String("nats_topic", "", "nats TOPIC")
 )
 
 func main() {

@@ -1,8 +1,8 @@
 package model
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 )
 
 // ReadingType reading type
