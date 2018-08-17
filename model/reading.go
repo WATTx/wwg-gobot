@@ -32,7 +32,7 @@ type MotionReading struct {
 	Value int
 }
 
-// Envelope encalpuse reading with its type
+// Envelope encapsule reading with its type
 type Envelope struct {
 	Type ReadingType
 	Data interface{}
@@ -71,7 +71,7 @@ func UnpackEnvelope(payload []byte) (Reading, error) {
 	return reading, nil
 }
 
-// Encode encode envelope it []byte
+// Encode encode envelope to []byte
 func (e Envelope) Encode() []byte {
 	buf, _ := json.Marshal(e)
 	return buf
