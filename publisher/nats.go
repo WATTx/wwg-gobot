@@ -11,7 +11,7 @@ type NATS struct {
 
 // newNATS creates new NATS connection
 func newNATS(url string) (*NATS, error) {
-	c, err := nats.Connect("nats://docker.test:4222")
+	c, err := nats.Connect(url)
 	if err != nil {
 		return nil, err
 	}

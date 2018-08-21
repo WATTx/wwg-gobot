@@ -15,7 +15,7 @@ const (
 
 var (
 	influxURL = flag.String("influx_url", "", "influxdb url")
-	natsURL   = flag.String("nats_url", "localhost:4222", "nats URL")
+	natsURL   = flag.String("nats_url", "nats://localhost:4222", "nats URL")
 )
 
 // byteToFloat32 converts slice of byte to float32
