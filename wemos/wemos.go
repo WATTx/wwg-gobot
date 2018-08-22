@@ -30,9 +30,9 @@ type Wemos struct {
 // NewWemos constructs new struct
 func NewWemos(f *firmata.TCPAdaptor, n *nats.Adaptor) *Wemos {
 	// new drivers
-	led := gpio.NewLedDriver(f, "2")
+	led := gpio.NewLedDriver(f, "14")
 	bme := i2c.NewBME280Driver(f, i2c.WithBus(0), i2c.WithAddress(0x76))
-	motion := gpio.NewPIRMotionDriver(f, "14")
+	motion := gpio.NewPIRMotionDriver(f, "12")
 
 	return &Wemos{
 		firmata: f,
