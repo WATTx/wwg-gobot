@@ -45,3 +45,4 @@ You need to build and start it like:
 cd wemos
 go build . && ./wemos --firmata_url=FIRMATA_IP:3030 --nats_url=nats://DOCKER_IP:4222
 ```
+(Please note: We are using the default ports here. If you specify other ports in docker-compose file or the scripts, you need to adjust them here as well.)
