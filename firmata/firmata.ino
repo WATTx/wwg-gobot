@@ -21,7 +21,7 @@
 
 #define NETWORK_PORT 3030
 
-char ssid[] = "WATTx_WiFi";
+char ssid[] = "WIFI_SSID";
 char wpa_passphrase[] = "WIFI_PASSWORD";
 
 WiFiServerStream stream(NETWORK_PORT);
