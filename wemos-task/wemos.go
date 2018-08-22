@@ -5,6 +5,7 @@ import (
 	"log"
 	_ "time"
 
+	"github.com/0xAX/notificator"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
 	"gobot.io/x/gobot/platforms/firmata"
@@ -31,8 +32,16 @@ type Wemos struct {
 	motion  *gpio.PIRMotionDriver
 }
 
+var (
+	notify *notificator.Notificator
+)
+
 // NewWemos constructs new struct
 func NewWemos(f *firmata.TCPAdaptor) *Wemos {
+	notify = notificator.New(notificator.Options{
+		AppName:     "Smart IoT",
+	})
+
 	ledExt := gpio.NewLedDriver(f, D5)
 	motion := gpio.NewPIRMotionDriver(f, D6)
 
@@ -60,11 +69,13 @@ func (w *Wemos) work() {
 
 	w.motion.On(gpio.MotionDetected, func(s interface{}) {
 		fmt.Println("motion detected")
+		notify.Push("motion", "detected", "", notificator.UR_CRITICAL)
 		w.ledExt.Off()
 	})
 
 	w.motion.On(gpio.MotionStopped, func(s interface{}) {
 		fmt.Println("motion stopped")
+		notify.Push("motion", "stopped", "", notificator.UR_NORMAL)
 		w.ledExt.On()
 	})
 }
