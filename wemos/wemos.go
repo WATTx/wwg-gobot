@@ -63,19 +63,19 @@ func (w *Wemos) work() {
 		if err != nil {
 			log.Printf("unable to get humidty: %s", err)
 		}
-
+		log.Printf("Humidity is %f", h)
 		w.nats.Publish(topicHumidity, []byte(fmt.Sprintf("%.2f", h)))
 	})
 
 	w.motion.On(gpio.MotionDetected, func(data interface{}) {
 		w.led.Off()
-
+		log.Println("Motion detected")
 		w.nats.Publish(topicMotion, []byte("1"))
 	})
 
 	w.motion.On(gpio.MotionStopped, func(data interface{}) {
 		w.led.On()
-
+		log.Printf("Motion stopped")
 		w.nats.Publish(topicMotion, []byte("0"))
 	})
 }
