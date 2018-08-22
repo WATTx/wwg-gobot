@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	_ "time"
+	"time"
 
 	"github.com/0xAX/notificator"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
+	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/firmata"
 )
 
@@ -30,6 +31,7 @@ type Wemos struct {
 	firmata *firmata.TCPAdaptor
 	ledExt  *gpio.LedDriver
 	motion  *gpio.PIRMotionDriver
+	bme     *i2c.BME280Driver
 }
 
 var (
@@ -39,16 +41,18 @@ var (
 // NewWemos constructs new struct
 func NewWemos(f *firmata.TCPAdaptor) *Wemos {
 	notify = notificator.New(notificator.Options{
-		AppName:     "Smart IoT",
+		AppName: "Smart IoT",
 	})
 
 	ledExt := gpio.NewLedDriver(f, D5)
 	motion := gpio.NewPIRMotionDriver(f, D6)
+	bme := i2c.NewBME280Driver(f, i2c.WithBus(0), i2c.WithAddress(0x76))
 
 	return &Wemos{
 		firmata: f,
 		ledExt:  ledExt,
 		motion:  motion,
+		bme:     bme,
 	}
 }
 
@@ -57,7 +61,7 @@ func (w *Wemos) Start() {
 	robot := gobot.NewRobot(
 		"bot",
 		[]gobot.Connection{w.firmata},
-		[]gobot.Device{w.ledExt, w.motion},
+		[]gobot.Device{w.ledExt, w.motion, w.bme},
 		w.work,
 	)
 
@@ -66,6 +70,10 @@ func (w *Wemos) Start() {
 
 func (w *Wemos) work() {
 	log.Println("Robot starts working...")
+
+	gobot.Every(1*time.Second, func() {
+		w.humidity()
+	})
 
 	w.motion.On(gpio.MotionDetected, func(s interface{}) {
 		fmt.Println("motion detected")
@@ -82,4 +90,15 @@ func (w *Wemos) work() {
 
 func (w *Wemos) toggleLed() {
 	w.ledExt.Toggle()
+}
+
+// Humidity returns humidty value from bme280 sensor
+func (w *Wemos) humidity() (float32, error) {
+	h, err := w.bme.Humidity()
+	log.Printf("%f", h)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return h, nil
 }
