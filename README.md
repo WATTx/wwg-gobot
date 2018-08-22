@@ -1,16 +1,16 @@
 # Women who Go Workshop: IoT with GoBot
 
 ### Set up your environment
-In order to be able to work with the micro-controller Wemos & and the GoLang framework GoBot we need to setup your machine first. Please have a look at our (preparational readme)[https://github.com/WATTx/wwg-gobot/blob/master/README.prep.md] and follow the instructions. 
+In order to be able to work with the micro-controller Wemos & and the GoLang framework GoBot we need to setup your machine first. Please have a look at our [preparational readme](https://github.com/WATTx/wwg-gobot/blob/master/README.prep.md) and follow the instructions. 
 
 
 
 #### Firmata
 The `firmata` directory contains the sketch that we will flash the micro-controller with in order to be able to send instructions to the micro-controller.
 
-We are using the Firmata library and its protocol to communicate with Wemos. (More information about Firmata in general)[https://www.arduino.cc/en/Reference/Firmata]
+We are using the Firmata library and its protocol to communicate with Wemos. [More information about Firmata in general](https://www.arduino.cc/en/Reference/Firmata)
 
-More information about how to use it you will find in the (prep readme)[https://github.com/WATTx/wwg-gobot/blob/master/README.prep.md].
+More information about how to use it you will find in the [prep readme](https://github.com/WATTx/wwg-gobot/blob/master/README.prep.md).
 
 
 #### Infra
@@ -22,11 +22,11 @@ docker-compose up
 ```
 
 (In order to use docker-compose up, you need to have docker & docker-compose installed.
-(prep readme)[https://github.com/WATTx/wwg-gobot/blob/master/README.prep.md])
+[prep readme](https://github.com/WATTx/wwg-gobot/blob/master/README.prep.md))
 
 
 #### Publisher
-The `publisher` will subscribe to the different topics in NATS (e.g. humidty or motion) and will write it to influxDB.
+The `publisher` will subscribe to the different topics in NATS (e.g. humidity or motion) and will write it to influxDB.
 
 You need to build and start it like:
 ```
