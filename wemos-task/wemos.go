@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"time"
+	_ "time"
 
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/gpio"
@@ -26,18 +27,19 @@ const LED_BUILTIN = "2"
 // Wemos describes esp
 type Wemos struct {
 	firmata *firmata.TCPAdaptor
-	ledBI   *gpio.LedDriver
 	ledExt  *gpio.LedDriver
+	motion  *gpio.PIRMotionDriver
 }
 
 // NewWemos constructs new struct
 func NewWemos(f *firmata.TCPAdaptor) *Wemos {
-	ledBI := gpio.NewLedDriver(f, LED_BUILTIN)
 	ledExt := gpio.NewLedDriver(f, D5)
+	motion := gpio.NewPIRMotionDriver(f, D6)
+
 	return &Wemos{
 		firmata: f,
-		ledBI:   ledBI,
 		ledExt:  ledExt,
+		motion:  motion,
 	}
 }
 
@@ -46,7 +48,7 @@ func (w *Wemos) Start() {
 	robot := gobot.NewRobot(
 		"bot",
 		[]gobot.Connection{w.firmata},
-		[]gobot.Device{w.ledBI, w.ledExt},
+		[]gobot.Device{w.ledExt, w.motion},
 		w.work,
 	)
 
@@ -55,10 +57,18 @@ func (w *Wemos) Start() {
 
 func (w *Wemos) work() {
 	log.Println("Robot starts working...")
-	gobot.Every(1*time.Second, w.toggleLed)
+
+	w.motion.On(gpio.MotionDetected, func(s interface{}) {
+		fmt.Println("motion detected")
+		w.ledExt.Off()
+	})
+
+	w.motion.On(gpio.MotionStopped, func(s interface{}) {
+		fmt.Println("motion stopped")
+		w.ledExt.On()
+	})
 }
 
 func (w *Wemos) toggleLed() {
-	w.ledBI.Toggle()
 	w.ledExt.Toggle()
 }
