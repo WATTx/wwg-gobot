@@ -21,6 +21,11 @@ cd infra
 docker-compose up
 ```
 
+Access chronograf: open the browser with following url
+```
+localhost:8888
+```
+
 (In order to use docker-compose up, you need to have docker & docker-compose installed.
 [prep readme](https://github.com/WATTx/wwg-gobot/blob/master/README.prep.md))
 
@@ -31,7 +36,7 @@ The `publisher` will subscribe to the different topics in NATS (e.g. humidity or
 You need to build and start it like:
 ```
 cd publisher
-go build . && ./publisher --influx_url=http://DOCKER_IP:8086 --nats_url=nats://DOCKER_IP:4222
+go build . && ./publisher --influx_url=http://localhost:8086 --nats_url=nats://localhost:4222
 ```
 
 (Please note: We are using the default ports here. If you specify other ports in docker-compose file or the scripts, you need to adjust them here as well.)
@@ -43,6 +48,6 @@ The `wemos` directory contains the source code for talking with Wemos via GoBot 
 You need to build and start it like:
 ```
 cd wemos
-go build . && ./wemos --firmata_url=FIRMATA_IP:3030 --nats_url=nats://DOCKER_IP:4222
+go build . && ./wemos --firmata_url=CHANGE_ME_FIRMATA_IP:3030 --nats_url=nats://localhost:4222
 ```
 (Please note: We are using the default ports here. If you specify other ports in docker-compose file or the scripts, you need to adjust them here as well.)
